@@ -3,32 +3,66 @@ import React, { useState } from 'react'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
+import { useQuery } from '@apollo/client'
+import { ALL_AUTHORS, ALL_BOOKS } from './queries'
+
+const Notify = ({ errorMessage }) => {
+    if (!errorMessage) {
+        return null
+    }
+
+    return (
+        <div style={{ color: 'red' }}>
+            {errorMessage}
+        </div>
+    )
+}
 
 const App = () => {
-  const [page, setPage] = useState('authors')
+    const [page, setPage] = useState('authors')
+    const [errorMessage, setErrorMessage] = useState(null)
+    const authorResult = useQuery(ALL_AUTHORS)
+    const bookResult = useQuery(ALL_BOOKS)
 
-  return (
-    <div>
-      <div>
-        <button onClick={() => setPage('authors')}>authors</button>
-        <button onClick={() => setPage('books')}>books</button>
-        <button onClick={() => setPage('add')}>add book</button>
-      </div>
+    if (authorResult.loading || bookResult.loading) {
+        return <div>loading...</div>
+    }
 
-      <Authors
-        show={page === 'authors'}
-      />
+    const notify = (message) => {
+        setErrorMessage(message)
+        setTimeout(() => {
+            setErrorMessage(null)
+        }, 10000)
+    }
 
-      <Books
-        show={page === 'books'}
-      />
 
-      <NewBook
-        show={page === 'add'}
-      />
+    return (
+        <div>
+            <div>
+                <button onClick={() => setPage('authors')}>authors</button>
+                <button onClick={() => setPage('books')}>books</button>
+                <button onClick={() => setPage('add')}>add book</button>
+            </div>
+            <Notify errorMessage={errorMessage} />
+            <Authors
+                show={page === 'authors'}
+                authors={authorResult.data.allAuthors}
+            />
 
-    </div>
-  )
+            <Books
+                show={page === 'books'}
+                books={bookResult.data.allBooks}
+            />
+            {page === 'add' ?
+                <NewBook
+                    setError={notify}
+                    setPage={setPage}
+                />
+                : <div></div>
+            }
+
+        </div>
+    )
 }
 
 export default App
