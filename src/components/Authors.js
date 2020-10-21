@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react'
+import Select from 'react-select'
 import { useMutation } from '@apollo/client'
 import { EDIT_AUTHOR } from '../queries'
 
 const Authors = ({ authors, setError }) => {
-    const [name, setName] = useState('Martin Fowler')
+    const [name, setName] = useState('')
     const [setBornTo, setYear] = useState('')
+    const authorNames = authors.map(a => { return { value: a.name, label: a.name } })
 
     const [ changeBirthYear, result ] = useMutation(EDIT_AUTHOR)
 
     useEffect(() => {
-        console.log(result)
         if (result.data && !result.data.editAuthor) {
             setError('Name not found')
         }
@@ -17,8 +18,6 @@ const Authors = ({ authors, setError }) => {
 
     const submit = async (event) => {
         event.preventDefault()
-
-        console.log(typeof name, typeof setBornTo)
 
         changeBirthYear({ variables: { name, setBornTo } })
     }
@@ -38,7 +37,7 @@ const Authors = ({ authors, setError }) => {
                         </th>
                     </tr>
                     {authors.map(a =>
-                        <tr key={a.id}>
+                        <tr key={a.name}>
                             <td>{a.name}</td>
                             <td>{a.born}</td>
                             <td>{a.bookCount}</td>
@@ -49,13 +48,11 @@ const Authors = ({ authors, setError }) => {
             <div>
                 <h2>Set author birthyear</h2>
                 <form onSubmit={submit}>
-                    <div>
-                        Name
-                        <input
-                            value={name}
-                            onChange={({ target }) => setName(target.value)}
-                        />
-                    </div>
+                    <Select
+                        value={name}
+                        onChange={(selectedOption) => setName(selectedOption.value)}
+                        options={authorNames}
+                    />
                     <div>
                         Born
                         <input
