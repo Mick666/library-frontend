@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useMutation } from '@apollo/client'
 import { ALL_BOOKS, CREATE_BOOK } from '../queries'
 
-const NewBook = ({ setError, setPage }) => {
+const NewBook = ({ token, show, setError, setPage }) => {
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
     const [published, setPublished] = useState('')
@@ -35,6 +35,10 @@ const NewBook = ({ setError, setPage }) => {
     const addGenre = () => {
         setGenres(genres.concat(genre))
         setGenre('')
+    }
+
+    if (!show || !token ) {
+        return null
     }
 
     return (
