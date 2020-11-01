@@ -11,12 +11,12 @@ const FavouriteGenre = ({ show, books, userDetails }) => {
         )
     }
 
-    const filteredBooks = books.filter(book => book.genres.includes(userDetails))
+    const filteredBooks = books.filter(book => book.genres.includes(userDetails.me.favouriteGenre))
 
     return (
         <div>
             <h2>books</h2>
-            {`Books in favourite genre: ${userDetails}`}
+            {`Books in favourite genre: ${userDetails.me.favouriteGenre}`}
             <table>
                 <tbody>
                     <tr style={{ textAlign: 'left' }}>

@@ -39,10 +39,10 @@ const App = () => {
         const token = localStorage.getItem('phonenumbers-user-token')
         if (token) {
             setToken(token)
-            getUserDetails()
         }
-        if (userResult.data && userResult.data.me) {
-            setDetails(userResult.data.me.favouriteGenre)
+        if (!userDetails) getUserDetails()
+        if (userResult.data) {
+            setDetails(userResult.data)
         }
 
     }, [userResult.data])
@@ -87,7 +87,7 @@ const App = () => {
                 setToken={setToken}
                 setError={setErrorMessage}
                 setPage={setPage}
-                setDetails={getUserDetails}
+                getUserDetails={getUserDetails}
             />
             <Authors
                 token={token}

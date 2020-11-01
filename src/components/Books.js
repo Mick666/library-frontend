@@ -9,16 +9,13 @@ const Books = ({ show, books }) => {
         return null
     }
     const genres = [...new Set(books.map(book => book.genres).flat())]
-    console.log(books)
 
     const handleGenreClick = (genre) => {
         if (genre === 'reset') {
             setVisibleBooks(books)
             setGenre(null)
-            console.log(books)
             return
         }
-        console.log(genre)
         const filteredBooks = books.filter(book => book.genres.includes(genre))
         setVisibleBooks(filteredBooks)
         setGenre(genre)
