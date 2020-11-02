@@ -1,25 +1,50 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useLazyQuery } from '@apollo/client'
+import { ALL_BOOKS } from '../queries'
+
+const VisibleBooks = ({ books }) => {
+    if (!books) return <div>Loading...</div>
+
+    return books.map(a =>
+        <tr key={a.title}>
+            <td>{a.title}</td>
+            <td>{a.author.name}</td>
+            <td>{a.published}</td>
+        </tr>
+    )
+}
 
 
 const Books = ({ show, books }) => {
     const [selectedGenre, setGenre ] = useState(null)
     const [visibleBooks, setVisibleBooks] = useState(books)
+    const [getFilteredBooks, genreResult] = useLazyQuery(ALL_BOOKS, {
+        fetchPolicy: 'network-only'
+    })
 
-    if (!show) {
-        return null
-    }
-    const genres = [...new Set(books.map(book => book.genres).flat())]
+    const getGenre = (genre) => {
 
-    const handleGenreClick = (genre) => {
         if (genre === 'reset') {
             setVisibleBooks(books)
             setGenre(null)
             return
         }
-        const filteredBooks = books.filter(book => book.genres.includes(genre))
-        setVisibleBooks(filteredBooks)
         setGenre(genre)
+        getFilteredBooks({ variables: { genre: genre } })
     }
+
+    useEffect(() => {
+        if (genreResult.data) {
+            setVisibleBooks(genreResult.data.allBooks)
+        }
+
+    }, [genreResult.data])
+
+
+    if (!show) {
+        return null
+    }
+    const genres = [...new Set(books.map(book => book.genres).flat().filter(x => x.length > 0))]
 
     return (
         <div>
@@ -36,26 +61,20 @@ const Books = ({ show, books }) => {
                             published
                         </th>
                     </tr>
-                    {visibleBooks.map(a =>
-                        <tr key={a.title}>
-                            <td>{a.title}</td>
-                            <td>{a.author.name}</td>
-                            <td>{a.published}</td>
-                        </tr>
-                    )}
+                    <VisibleBooks books={visibleBooks} />
                 </tbody>
             </table>
             {genres.map((genre, i) => {
                 return <button
                     key={i}
-                    onClick={() => handleGenreClick(genre)}
+                    onClick={() => getGenre(genre)}
                 >
                     {genre}
                 </button>
             })
             }
             <button
-                onClick={() => handleGenreClick('reset')}
+                onClick={() => getGenre('reset')}
             >
             reset
             </button>
