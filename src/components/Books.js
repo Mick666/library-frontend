@@ -21,6 +21,7 @@ const Books = ({ show, books }) => {
     const [getFilteredBooks, genreResult] = useLazyQuery(ALL_BOOKS, {
         fetchPolicy: 'network-only'
     })
+    if (!selectedGenre && visibleBooks.length !== books.length) setVisibleBooks(books)
 
     const getGenre = (genre) => {
 
@@ -45,6 +46,7 @@ const Books = ({ show, books }) => {
         return null
     }
     const genres = [...new Set(books.map(book => book.genres).flat().filter(x => x.length > 0))]
+    console.log(visibleBooks)
 
     return (
         <div>

@@ -20,6 +20,7 @@ query allBooks($genre: String) {
 		}
     published
     genres
+    id
   }
 }
 `
@@ -39,6 +40,7 @@ mutation createBook($title: String!, $author: String!, $published: String!, $gen
 		}
     published
     genres
+    id
   }
 }
 `
@@ -69,4 +71,19 @@ query {
     username
   }
 }
+`
+
+export const BOOK_ADDED = gql `
+  subscription {
+    bookAdded {
+      title
+      author {
+        name
+        born
+      }
+      published
+      genres
+      id
+    }
+  }
 `
